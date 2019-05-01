@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Fragments.ProfileFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent"
+        android:layout_weight="4">
+
+        <RelativeLayout
+            android:id="@+id/profileImageLayout"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp">
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:transitionName="profileImage"
+                app:srcCompat="@drawable/profile_photo"
+                />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginRight="20dp"
+            android:layout_toRightOf="@id/profileImageLayout">
+            <TextView
+                android:id="@+id/textViewUserName"
+                android:textSize="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:transitionName="textViewUserName"
+                android:text="John Doe"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
+            <TextView
+                android:id="@+id/textViewUserAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewUserName"
+                android:transitionName="textViewUserAge"
+                android:text="22 Age  |"
+                android:textColor="@android:color/white"
+                />
+            <TextView
+                android:id="@+id/textViewGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewUserName"
+                android:layout_toEndOf="@id/textViewUserAge"
+                android:transitionName="textViewGender"
+                android:text=" Man |"
+                android:textColor="@android:color/white"
+                />
+            <TextView
+                android:id="@+id/textViewHeight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewUserName"
+                android:transitionName="textViewHeight"
+                android:layout_toEndOf="@id/textViewGender"
+                android:text="  1.80 cm  |"
+                android:textColor="@android:color/white"
+                />
+            <TextView
+                android:id="@+id/textViewWeight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textViewUserName"
+                android:transitionName="textViewWeight"
+                android:layout_toEndOf="@id/textViewHeight"
+                android:text="  70 lbs  "
+                android:textColor="@android:color/white"
+                />
+            <TextView
+                android:id="@+id/textViewBio"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:transitionName="textViewBio"
+                android:padding="5dp"
+                android:layout_below="@id/textViewUserAge"
+                android:textColor="@android:color/white"
+                android:text="@string/lorem"/>
+        </RelativeLayout>
+        <ImageButton
+            android:id="@+id/profileEdit"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_edit_black_24dp"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">SmartWatch</string>
+    <string name="title_activity_login">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="slide_1_title">Düzenli olarak koşu yap</string>
+    <string name="slide_2_title">Sağlıklı beslen</string>
+    <string name="slide_3_title">Sürekli hareket et</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
