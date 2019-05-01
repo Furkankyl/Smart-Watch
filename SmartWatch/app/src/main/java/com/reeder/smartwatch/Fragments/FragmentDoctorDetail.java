@@ -1,56 +1,42 @@
 package com.reeder.smartwatch.Fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.reeder.smartwatch.Activities.LoginActivity;
-import com.reeder.smartwatch.Activities.RegisterActivity;
-import com.reeder.smartwatch.Adapters.DoctorAdapter;
-import com.reeder.smartwatch.Adapters.FamilyMemberAdapter;
-import com.reeder.smartwatch.Helpers.ViewPagerAdapter;
 import com.reeder.smartwatch.Model.Doctor;
-import com.reeder.smartwatch.Model.FamilyMember;
 import com.reeder.smartwatch.R;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FamilyFragment.OnFragmentInteractionListener} interface
+ * {@link FragmentDoctorDetail.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link FamilyFragment#newInstance} factory method to
+ * Use the {@link FragmentDoctorDetail#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FamilyFragment extends Fragment {
+public class FragmentDoctorDetail extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
-    public FamilyFragment() {
-        // Required empty public constructor
+    public FragmentDoctorDetail() {
+
     }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -58,11 +44,11 @@ public class FamilyFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment FamilyFragment.
+     * @return A new instance of fragment FragmentDoctorDetail.
      */
     // TODO: Rename and change types and number of parameters
-    public static FamilyFragment newInstance(String param1, String param2) {
-        FamilyFragment fragment = new FamilyFragment();
+    public static FragmentDoctorDetail newInstance(String param1, String param2) {
+        FragmentDoctorDetail fragment = new FragmentDoctorDetail();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -77,38 +63,18 @@ public class FamilyFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_x_layout, container, false);
-
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-
-        tabLayout = (TabLayout) view.findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-
-
-        return view;
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_doctor_detail, container, false);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        setupViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
-
-    }
-
-    private void setupViewPager(ViewPager viewPager) {
-
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
-        adapter.addFragment(new DoctorsFragment(),"Doktorlarım");
-        adapter.addFragment(new FamilyMembersFragment(), "Ailem");
-        viewPager.setAdapter(adapter);
-    }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

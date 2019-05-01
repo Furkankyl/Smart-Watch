@@ -19,14 +19,16 @@
             android:layout_height="100dp"
             android:layout_alignParentBottom="true"
             android:layout_margin="20dp">
+
             <ImageView
                 android:id="@+id/profileImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
                 android:layout_alignParentBottom="true"
+                android:layout_marginTop="0dp"
                 android:transitionName="profileImage"
-                app:srcCompat="@drawable/profile_photo"
-                />
+                app:srcCompat="@drawable/profile_photo" />
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"

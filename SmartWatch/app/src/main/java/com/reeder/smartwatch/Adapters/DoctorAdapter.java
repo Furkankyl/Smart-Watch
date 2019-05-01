@@ -47,6 +47,8 @@ public class DoctorAdapter extends BaseAdapter {
         Doctor doctor = doctorList.get(i);
         textViewName.setText(doctor.getName());
         textViewExplonation.setText(doctor.getBio());
+
+
         return row_view;
     }
 }

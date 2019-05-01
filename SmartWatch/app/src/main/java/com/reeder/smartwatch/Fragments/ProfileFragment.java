@@ -1,8 +1,11 @@
 package com.reeder.smartwatch.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.internal.BottomNavigationMenu;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.reeder.smartwatch.Activities.UserProfileActivity;
 import com.reeder.smartwatch.R;
 
 
@@ -83,6 +87,8 @@ public class ProfileFragment extends Fragment {
         buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //startActivity(new Intent(getActivity(), UserProfileActivity.class));
+
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .addSharedElement(profileImageView, "profileImage")
@@ -91,6 +97,7 @@ public class ProfileFragment extends Fragment {
                         .replace(R.id.frameLayout, new UserProfileFragment())
                         .addToBackStack(null)
                         .commit();
+
             }
         });
         return view;
