@@ -1,13 +1,13 @@
 package com.reeder.smartwatch.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.Model.FamilyMember;
 import com.reeder.smartwatch.R;
 
@@ -37,14 +37,17 @@ public class FamilyMemberAdapter extends BaseAdapter {
         return i;
     }
 
+    @SuppressLint({"ViewHolder", "InflateParams"})
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        View row_view = layoutInflater.inflate(R.layout.family_simple_layout,null);
+        View row_view =null;
+        row_view= layoutInflater.inflate(R.layout.family_simple_layout,null);
+        final TextView textViewPersonName = (TextView) row_view.findViewById(R.id.textViewPersonName1);
+        TextView textViewExplonation = (TextView) row_view.findViewById(R.id.textViewPersonExplonation1);
+        final ImageView imageViewPerson = (ImageView) row_view.findViewById(R.id.imageViewPerson1);
 
-        TextView textViewName = (TextView) row_view.findViewById(R.id.textViewPersonName);
-        TextView textViewExplonation = (TextView) row_view.findViewById(R.id.textViewPersonExplonation);
         FamilyMember familyMember = familyMemberList.get(i);
-        textViewName.setText(familyMember.getName());
+        textViewPersonName.setText(familyMember.getName());
         textViewExplonation.setText(familyMember.getBio());
         return row_view;
     }

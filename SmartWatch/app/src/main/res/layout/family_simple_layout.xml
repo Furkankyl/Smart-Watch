@@ -1,49 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<?xml version="1" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="10dp"
-    android:layout_height="100dp">
-    <ImageButton
-        android:id="@+id/imageButtonOptions"
-        android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+
+    <ImageView
+        android:id="@+id/imageViewPerson1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:src="@drawable/profile_photo" />
+
+    <LinearLayout
+        android:id="@+id/linearLayoutPersonInfo"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
-         />
-        <ImageView
-            android:id="@+id/imageViewPerson"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/profile_photo"/>
-        <LinearLayout
-            android:id="@+id/linearLayoutPersonInfo"
-            android:layout_toRightOf="@id/imageViewPerson"
+        android:layout_weight="1"
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewPersonName1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="John Doe"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewPersonExplonation1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginRight="24dp"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/textViewPersonName"
-                android:layout_width="match_parent"
-                android:padding="5dp"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="John Doe"
-                android:textSize="15dp"
-                android:textColor="@color/colorAccent"
-                android:textStyle="bold"
-                />
-            <TextView
-                android:id="@+id/textViewPersonExplonation"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="5dp"
-                android:text="@string/lorem"/>
-        </LinearLayout>
+            android:padding="5dp"
+            android:text="@string/lorem" />
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/imageButtonOptions"
+        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_keyboard_arrow_right_black_24dp" />
 
 
-</RelativeLayout>
+</LinearLayout>

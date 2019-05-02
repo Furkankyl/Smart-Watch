@@ -3,11 +3,15 @@ package com.reeder.smartwatch.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.reeder.smartwatch.Adapters.FamilyMemberAdapter;
 import com.reeder.smartwatch.Model.FamilyMember;
@@ -15,6 +19,7 @@ import com.reeder.smartwatch.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -69,25 +74,41 @@ public class FamilyMembersFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_families, container, false);
+
         listViewFamily = (ListView) view.findViewById(R.id.listViewMember);
 
+        familyMemberList = new ArrayList<>();
+        familyMemberList.add(new FamilyMember("Patricia Lebsack","Annem",""));
+        familyMemberList.add(new FamilyMember("Chelsey Dietrich","Babam",""));
+        familyMemberList.add(new FamilyMember("Kurtis Weissnat","Kardeşim",""));
+
+        FamilyMemberAdapter familyMemberAdapter = new FamilyMemberAdapter(familyMemberList, Objects.requireNonNull(getActivity()));
+        listViewFamily.setAdapter(familyMemberAdapter);
+
+        listViewFamily.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getActivity(), "listview", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Button button = (Button) view.findViewById(R.id.testButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(), "Test", Toast.LENGTH_SHORT).show();
+            }
+        });
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        familyMemberList = new ArrayList<>();
-        familyMemberList.add(new FamilyMember("Patricia Lebsack","Annem",""));
-        familyMemberList.add(new FamilyMember("Chelsey Dietrich","Babam",""));
-        familyMemberList.add(new FamilyMember("Kurtis Weissnat","Kardeşim",""));
 
-        FamilyMemberAdapter familyMemberAdapter = new FamilyMemberAdapter(familyMemberList,getContext());
-        listViewFamily.setAdapter(familyMemberAdapter);
 
     }
 

@@ -2,6 +2,7 @@ package com.reeder.smartwatch.Activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -18,6 +20,7 @@ import android.view.animation.Animation;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+
 import com.reeder.smartwatch.Fragments.FamilyFragment;
 import com.reeder.smartwatch.Fragments.ProfileFragment;
 import com.reeder.smartwatch.R;
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
             Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-
+                    startActivity(new Intent(MainActivity.this,TestActivity.class));
                     break;
                 case R.id.navigation_dashboard:
                     selectedFragment = new FamilyFragment();
@@ -44,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
             if (selectedFragment != null) {
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+                if(fragment != null){
+                    Toast.makeText(MainActivity.this, "Silindi"+fragment.getClass(), Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                }
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.frameLayout, selectedFragment);
                 transaction.commit();
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frameLayout, new ProfileFragment());
+        transaction.replace(R.id.frameLayout, new FamilyFragment());
         transaction.commit();
 
         authStateListener = new FirebaseAuth.AuthStateListener() {

@@ -30,8 +30,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.reeder.smartwatch.R;
 import com.squareup.picasso.Picasso;
 

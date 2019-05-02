@@ -1,16 +1,23 @@
 package com.reeder.smartwatch.Fragments;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
-import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.R;
 
 /**
@@ -26,7 +33,7 @@ public class FragmentDoctorDetail extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private static final int CALL_PERMISSON_REQUEST_CODE = 100;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -71,8 +78,35 @@ public class FragmentDoctorDetail extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_doctor_detail, container, false);
+        ImageButton buttonCall = (ImageButton) view.findViewById(R.id.callButton);
+        buttonCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(checkPermission()){
+                    callPhoneNumber("+905373620617");
+                }else{
+                    requestPermission();
+                }
+
+            }
+        });
+
+        ImageButton buttonSms = (ImageButton) view.findViewById(R.id.smsButton);
+        buttonSms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendSms("+905373620617","Test Message");
+            }
+        });
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_doctor_detail, container, false);
+        return view;
+    }
+    private void sendSms(String phoneNumber, String message) {
+        Uri uri = Uri.parse("smsto:"+phoneNumber);
+        Intent intent = new Intent (Intent.ACTION_SENDTO,uri);
+        intent.putExtra("sms_body",message);
+        startActivity(intent);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -81,7 +115,54 @@ public class FragmentDoctorDetail extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+    public void callPhoneNumber(String phoneNumber){
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:"+phoneNumber));
+        if(intent.resolveActivity(getActivity().getPackageManager()) != null){
+            startActivity(intent);
+        }else{
+            Toast.makeText(getActivity(), "Aranamadı!", Toast.LENGTH_SHORT).show();
+        }
+    }
 
+    public boolean checkPermission() {
+        // result WRITE_EXTERNAL_STORAGE izni var mı? varsa 0 yoksa -1
+        int result = ContextCompat.
+                checkSelfPermission(getActivity()
+                        , Manifest.permission.CALL_PHONE);
+        // result1 CALL_PHONE izni var mı? varsa 0 yoksa -1
+        //İkisinede izin verilmiş ise true diğer durumlarda false döner
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public void requestPermission() {
+        //Verilen String[] dizisi içerisindeki izinlere istek atılır
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.CALL_PHONE},
+                CALL_PERMISSON_REQUEST_CODE);
+    }
+
+
+    //İstek atılır istek onay/red işlemi bittiğinde bu metod çalışır
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // requestCode istek atılırken kullanılan kod ile aynıysa
+        if (requestCode == CALL_PERMISSON_REQUEST_CODE) {
+            if (grantResults.length > 0) { // İzin verilenlerin listesi en az 1 elemanlı ise
+                //Record izni verildi mi?
+                boolean permissionToCall = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                //External Store izni verildi mi
+
+                if (permissionToCall) {
+                    Toast.makeText(getActivity(), "İzinler alındı!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(getActivity(), "İzin vermen gerekli!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

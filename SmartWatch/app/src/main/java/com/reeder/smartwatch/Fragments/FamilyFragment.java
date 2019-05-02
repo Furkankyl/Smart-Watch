@@ -1,29 +1,24 @@
 package com.reeder.smartwatch.Fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.reeder.smartwatch.Activities.LoginActivity;
 import com.reeder.smartwatch.Activities.RegisterActivity;
-import com.reeder.smartwatch.Adapters.DoctorAdapter;
-import com.reeder.smartwatch.Adapters.FamilyMemberAdapter;
 import com.reeder.smartwatch.Helpers.ViewPagerAdapter;
-import com.reeder.smartwatch.Model.Doctor;
-import com.reeder.smartwatch.Model.FamilyMember;
 import com.reeder.smartwatch.R;
 
-import java.util.ArrayList;
-import java.util.List;
+import static android.support.constraint.Constraints.TAG;
 
 
 /**
@@ -84,9 +79,9 @@ public class FamilyFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_x_layout, container, false);
 
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
+        viewPager = (ViewPager) view.findViewById(R.id.viewpagerFamily);
         setupViewPager(viewPager);
-
+        Log.d(TAG, "onCreateView: ");
         tabLayout = (TabLayout) view.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -95,16 +90,22 @@ public class FamilyFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        viewPager = (ViewPager) view.findViewById(R.id.viewpagerFamily);
+        setupViewPager(viewPager);
+        Log.d(TAG, "onCreateView: ");
+        tabLayout = (TabLayout) view.findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+    }
+    @Override
     public void onStart() {
         super.onStart();
-        setupViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
 
     }
-
     private void setupViewPager(ViewPager viewPager) {
-
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
+        Log.d(TAG, "setupViewPager: ");
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(new DoctorsFragment(),"Doktorlarım");
         adapter.addFragment(new FamilyMembersFragment(), "Ailem");
         viewPager.setAdapter(adapter);

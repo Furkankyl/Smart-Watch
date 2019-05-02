@@ -1,21 +1,23 @@
 package com.reeder.smartwatch.Fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.internal.BottomNavigationMenu;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.reeder.smartwatch.Activities.UserProfileActivity;
+import com.reeder.smartwatch.Adapters.FamilyMemberAdapter;
+import com.reeder.smartwatch.Model.FamilyMember;
 import com.reeder.smartwatch.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -31,7 +33,8 @@ public class ProfileFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private String array_spinner[];
+    private List<FamilyMember> familyMemberList;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -82,12 +85,28 @@ public class ProfileFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         profileImageView = (ImageView) view.findViewById(R.id.profileImage);
+
+        array_spinner=new String[5];
+        array_spinner[0]="option 1";
+        array_spinner[1]="option 2";
+        array_spinner[2]="option 3";
+        array_spinner[3]="option 4";
+        array_spinner[4]="option 5";
+        Spinner s = (Spinner) view.findViewById(R.id.spinner);
+        familyMemberList = new ArrayList<>();
+        familyMemberList.add(new FamilyMember("John Doe","Kalp cerrahı",""));
+        familyMemberList.add(new FamilyMember("Ervin Howell","Beyin cerrahı",""));
+        familyMemberList.add(new FamilyMember("Clementine Bauch","Genel cerrahi",""));
+        FamilyMemberAdapter doctorAdapter = new FamilyMemberAdapter(familyMemberList, getContext());
+        s.setAdapter(doctorAdapter);
+
         ImageButton buttonEdit = (ImageButton) view.findViewById(R.id.profileEdit);
         final TextView textViewUserName = (TextView) view.findViewById(R.id.textViewUserName);
         buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //startActivity(new Intent(getActivity(), UserProfileActivity.class));
+
 
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()

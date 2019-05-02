@@ -12,5 +12,10 @@
     <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string-array name="Family">
+        <item>John Doe</item>
+        <item>John Doe</item>
+        <item>John Doe</item>
+        <item>John Doe</item>
+    </string-array>
 </resources>

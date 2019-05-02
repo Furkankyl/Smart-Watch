@@ -3,11 +3,15 @@ package com.reeder.smartwatch.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,10 +39,11 @@ public class DoctorsFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private ListView listViewDoctors;
     private List<Doctor> doctorList;
+    private static final String TAG = "DoctorsFragmetn";
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    DoctorAdapter doctorAdapter;
     private OnFragmentInteractionListener mListener;
 
     public DoctorsFragment() {
@@ -70,6 +75,7 @@ public class DoctorsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Log.d(TAG, "onCreate: ");
     }
 
     @Override
@@ -77,11 +83,24 @@ public class DoctorsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_doctors, container, false);
         listViewDoctors = (ListView) view.findViewById(R.id.listViewMember);
-
+        Log.d(TAG, "onCreateView: DoctorsFragment");
+        doctorList = new ArrayList<>();
+        doctorList.add(new Doctor("John Doe","Kalp cerrahı","s"));
+        doctorList.add(new Doctor("Ervin Howell","Beyin cerrahı","s"));
+        doctorList.add(new Doctor("Clementine Bauch","Genel cerrahi","s"));
+        doctorAdapter = new DoctorAdapter(doctorList,getActivity(),getActivity().getSupportFragmentManager());
+        String[] ulkeler =
+                {"Türkiye", "Almanya", "Avusturya", "Amerika","İngiltere",
+                        "Macaristan", "Yunanistan", "Rusya", "Suriye", "İran", "Irak",
+                        "Şili", "Brezilya", "Japonya", "Portekiz", "İspanya",
+                        "Makedonya", "Ukrayna", "İsviçre"};
+        //ArrayAdapter<String> doctorAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_expandable_list_item_2,android.R.id.text1,ulkeler);
+        listViewDoctors.setAdapter(doctorAdapter);
         listViewDoctors.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ImageView profileImageView = (ImageView) view.findViewById(R.id.imageViewPerson);
+                Toast.makeText(getActivity(), "Test", Toast.LENGTH_SHORT).show();
+                /*ImageView profileImageView = (ImageView) view.findViewById(R.id.imageViewPerson);
                 TextView textViewUserName = (TextView) view.findViewById(R.id.textViewPersonName);
                 Toast.makeText(getActivity(), "Seçilen: "+doctorList.get(i).getName(), Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager()
@@ -92,6 +111,7 @@ public class DoctorsFragment extends Fragment {
                         .replace(R.id.frameLayout, new UserProfileFragment())
                         .addToBackStack(null)
                         .commit();
+                        */
             }
         });
 
@@ -99,17 +119,50 @@ public class DoctorsFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView: ");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop: ");
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated: ");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated: ");
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
-        doctorList = new ArrayList<>();
+        Log.d(TAG, "onStart: ");
 
-        doctorList.add(new Doctor("John Doe","Kalp cerrahı",""));
-        doctorList.add(new Doctor("Ervin Howell","Beyin cerrahı",""));
-        doctorList.add(new Doctor("Clementine Bauch","Genel cerrahi",""));
-        DoctorAdapter doctorAdapter = new DoctorAdapter(doctorList,getContext());
-        listViewDoctors.setAdapter(doctorAdapter);
 
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -120,12 +173,14 @@ public class DoctorsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d(TAG, "onAttach: ");
 
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.d(TAG, "onDetach: ");
         mListener = null;
     }
 
