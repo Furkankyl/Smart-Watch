@@ -25,7 +25,7 @@
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:transitionName="textViewUserName" />
+            android:transitionName="textViewTitle" />
     </android.support.v7.widget.Toolbar>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -56,7 +56,7 @@
             android:layout_centerHorizontal="true"
             android:src="@drawable/profile_photo"
             android:layout_margin="10dp"
-            android:transitionName="imageViewPerson" />
+            android:transitionName="imageViewPhoto" />
 
         <LinearLayout
             android:id="@+id/linearLayoutPersonInfo"
@@ -75,7 +75,7 @@
                 android:textColor="@color/colorAccent"
                 android:textSize="15dp"
                 android:textStyle="bold"
-                android:transitionName="textViewPersonName" />
+                android:transitionName="textViewPersonName1" />
 
             <TextView
                 android:id="@+id/textViewPersonExplonation"

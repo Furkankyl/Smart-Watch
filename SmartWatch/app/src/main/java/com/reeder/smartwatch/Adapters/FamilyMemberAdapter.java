@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.Model.FamilyMember;
 import com.reeder.smartwatch.R;
 
@@ -41,11 +43,10 @@ public class FamilyMemberAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         View row_view =null;
-        row_view= layoutInflater.inflate(R.layout.family_simple_layout,null);
-        final TextView textViewPersonName = (TextView) row_view.findViewById(R.id.textViewPersonName1);
-        TextView textViewExplonation = (TextView) row_view.findViewById(R.id.textViewPersonExplonation1);
-        final ImageView imageViewPerson = (ImageView) row_view.findViewById(R.id.imageViewPerson1);
-
+        row_view = layoutInflater.inflate(R.layout.doctor_row_layout,null);
+        final TextView textViewPersonName = (TextView) row_view.findViewById(R.id.textViewTitle);
+        TextView textViewExplonation = (TextView) row_view.findViewById(R.id.textViewContent);
+        //final ImageView imageViewPerson = (ImageView) row_view.findViewById(R.id.imageViewPerson);
         FamilyMember familyMember = familyMemberList.get(i);
         textViewPersonName.setText(familyMember.getName());
         textViewExplonation.setText(familyMember.getBio());

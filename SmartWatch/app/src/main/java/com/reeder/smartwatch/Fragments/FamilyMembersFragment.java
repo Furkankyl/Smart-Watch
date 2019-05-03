@@ -95,13 +95,6 @@ public class FamilyMembersFragment extends Fragment {
                 Toast.makeText(getActivity(), "listview", Toast.LENGTH_SHORT).show();
             }
         });
-        Button button = (Button) view.findViewById(R.id.testButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(), "Test", Toast.LENGTH_SHORT).show();
-            }
-        });
         return view;
     }
 

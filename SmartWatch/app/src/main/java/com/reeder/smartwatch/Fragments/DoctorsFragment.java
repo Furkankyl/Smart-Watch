@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.reeder.smartwatch.Adapters.CustomArrayAdapter;
 import com.reeder.smartwatch.Adapters.DoctorAdapter;
 import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.R;
@@ -43,7 +44,6 @@ public class DoctorsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    DoctorAdapter doctorAdapter;
     private OnFragmentInteractionListener mListener;
 
     public DoctorsFragment() {
@@ -81,43 +81,46 @@ public class DoctorsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_doctors, container, false);
+
+        View view=inflater.inflate(R.layout.fragment_doctors, container,false);
+
         listViewDoctors = (ListView) view.findViewById(R.id.listViewMember);
         Log.d(TAG, "onCreateView: DoctorsFragment");
         doctorList = new ArrayList<>();
         doctorList.add(new Doctor("John Doe","Kalp cerrahı","s"));
         doctorList.add(new Doctor("Ervin Howell","Beyin cerrahı","s"));
         doctorList.add(new Doctor("Clementine Bauch","Genel cerrahi","s"));
-        doctorAdapter = new DoctorAdapter(doctorList,getActivity(),getActivity().getSupportFragmentManager());
+        DoctorAdapter doctorAdapter = new DoctorAdapter(doctorList,getActivity(),getActivity().getSupportFragmentManager());
         String[] ulkeler =
                 {"Türkiye", "Almanya", "Avusturya", "Amerika","İngiltere",
                         "Macaristan", "Yunanistan", "Rusya", "Suriye", "İran", "Irak",
                         "Şili", "Brezilya", "Japonya", "Portekiz", "İspanya",
                         "Makedonya", "Ukrayna", "İsviçre"};
         //ArrayAdapter<String> doctorAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_expandable_list_item_2,android.R.id.text1,ulkeler);
+        //CustomArrayAdapter doctorAdapter = new CustomArrayAdapter(doctorList,getActivity());
         listViewDoctors.setAdapter(doctorAdapter);
+
         listViewDoctors.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(getActivity(), "Test", Toast.LENGTH_SHORT).show();
-                /*ImageView profileImageView = (ImageView) view.findViewById(R.id.imageViewPerson);
-                TextView textViewUserName = (TextView) view.findViewById(R.id.textViewPersonName);
+                ImageView profileImageView = (ImageView) view.findViewById(R.id.imageViewPhoto);
+                TextView textViewUserName = (TextView) view.findViewById(R.id.textViewTitle);
                 Toast.makeText(getActivity(), "Seçilen: "+doctorList.get(i).getName(), Toast.LENGTH_SHORT).show();
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .addSharedElement(profileImageView, "profileImage")
-                        .addSharedElement(textViewUserName, "textViewUserName")
+                        .addSharedElement(profileImageView, "imageViewPhoto")
+                        .addSharedElement(textViewUserName, "textViewTitle")
                         .setCustomAnimations(R.anim.fade_in_animation,R.anim.fade_out_animation)
-                        .replace(R.id.frameLayout, new UserProfileFragment())
+                        .replace(R.id.frameLayout, new FragmentDoctorDetail())
                         .addToBackStack(null)
                         .commit();
-                        */
+
             }
         });
 
         return view;
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();

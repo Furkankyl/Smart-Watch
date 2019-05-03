@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.reeder.smartwatch.Fragments.FragmentDoctorDetail;
 import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.R;
 
@@ -43,12 +45,12 @@ public class DoctorAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         View row_view;
-        row_view= layoutInflater.inflate(R.layout.family_simple_layout,null);
+        row_view= layoutInflater.inflate(R.layout.doctor_row_layout,null);
 
-        final TextView textViewPersonName = (TextView) row_view.findViewById(R.id.textViewPersonName1);
-        TextView textViewExplonation = (TextView) row_view.findViewById(R.id.textViewPersonExplonation1);
-        final ImageView imageViewPerson = (ImageView) row_view.findViewById(R.id.imageViewPerson1);
-        Doctor doctor = doctorList.get(i);
+        final TextView textViewPersonName = (TextView) row_view.findViewById(R.id.textViewTitle);
+        TextView textViewExplonation = (TextView) row_view.findViewById(R.id.textViewContent);
+       //final ImageView imageViewPerson = (ImageView) row_view.findViewById(R.id.imageViewPerson);
+        final Doctor doctor = doctorList.get(i);
         textViewPersonName.setText(doctor.getName());
         textViewExplonation.setText(doctor.getBio());
 
@@ -58,15 +60,17 @@ public class DoctorAdapter extends BaseAdapter {
 
                 fragmentManager
                         .beginTransaction()
-                        .addSharedElement(imageViewPerson, "imageViewPerson")
-                        .addSharedElement(textViewPersonName, "textViewPersonName")
+                        .addSharedElement(imageViewPerson, "imageViewPerson1")
+                        .addSharedElement(textViewPersonName, "textViewPersonName1")
                         .setCustomAnimations(R.anim.fade_in_animation,R.anim.fade_out_animation)
-                        .replace(R.id.frameLayout, new FragmentDoctorDetail())
+                        .replace(R.id.frameLayout, new FragmentDoctorDetail(doctor))
                         .addToBackStack(null)
                         .commit();
             }
         });
-        */
+*/
         return row_view;
     }
+
+
 }

@@ -5,17 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:focusable="false"
-    tools:context=".Adapters.Fragments.FamilyFragment">
-    <Button
-        android:id="@+id/testButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    tools:context=".Fragments.FamilyFragment">
     <ListView
         android:id="@+id/listViewMember"
+        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:listSelector="#282196F3"
-
+        android:listSelector="@color/listViewSelectorColor"
         android:layout_marginTop="10dp"
         tools:listitem="@layout/family_simple_layout">
 

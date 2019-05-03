@@ -1,6 +1,7 @@
 package com.reeder.smartwatch.Fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,9 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.R;
+
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +39,7 @@ public class FragmentDoctorDetail extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final int CALL_PERMISSON_REQUEST_CODE = 100;
+    private Doctor doctor;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -44,6 +50,10 @@ public class FragmentDoctorDetail extends Fragment {
 
     }
 
+    @SuppressLint("ValidFragment")
+    public FragmentDoctorDetail(Doctor doctor) {
+        this.doctor = doctor;
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -76,9 +86,25 @@ public class FragmentDoctorDetail extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_doctor_detail, container, false);
+        TextView textViewPersonNameTitle = (TextView) view.findViewById(R.id.textViewUserName);
+        TextView textViewPersonName = (TextView) view.findViewById(R.id.textViewPersonName);
+        TextView textViewPersonExplonation = (TextView) view.findViewById(R.id.textViewPersonExplonation);
+        ImageButton buttonBack  =(ImageButton) view.findViewById(R.id.buttonBack);
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Objects.requireNonNull(getActivity()).onBackPressed();
+            }
+        });
+        if(doctor != null){
+            textViewPersonNameTitle.setText(doctor.getName());
+            textViewPersonName.setText(doctor.getName());
+            textViewPersonExplonation.setText(doctor.getBio());
+        }
+
         ImageButton buttonCall = (ImageButton) view.findViewById(R.id.callButton);
         buttonCall.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,14 +122,14 @@ public class FragmentDoctorDetail extends Fragment {
         buttonSms.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendSms("+905373620617","Test Message");
+                sendSms("Test Message");
             }
         });
         // Inflate the layout for this fragment
         return view;
     }
-    private void sendSms(String phoneNumber, String message) {
-        Uri uri = Uri.parse("smsto:"+phoneNumber);
+    private void sendSms(String message) {
+        Uri uri = Uri.parse("smsto:"+ "+905373620617");
         Intent intent = new Intent (Intent.ACTION_SENDTO,uri);
         intent.putExtra("sms_body",message);
         startActivity(intent);
@@ -155,6 +181,7 @@ public class FragmentDoctorDetail extends Fragment {
                 //External Store izni verildi mi
 
                 if (permissionToCall) {
+                    callPhoneNumber("+905373620617");
                     Toast.makeText(getActivity(), "İzinler alındı!", Toast.LENGTH_SHORT).show();
 
                 } else {

@@ -1,5 +1,7 @@
 package com.reeder.smartwatch.Fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,9 +9,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.reeder.smartwatch.Adapters.FamilyMemberAdapter;
@@ -40,6 +48,7 @@ public class ProfileFragment extends Fragment {
     private String mParam2;
     private ImageView profileImageView;
     private OnFragmentInteractionListener mListener;
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -86,12 +95,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         profileImageView = (ImageView) view.findViewById(R.id.profileImage);
 
-        array_spinner=new String[5];
-        array_spinner[0]="option 1";
-        array_spinner[1]="option 2";
-        array_spinner[2]="option 3";
-        array_spinner[3]="option 4";
-        array_spinner[4]="option 5";
+
         Spinner s = (Spinner) view.findViewById(R.id.spinner);
         familyMemberList = new ArrayList<>();
         familyMemberList.add(new FamilyMember("John Doe","Kalp cerrahı",""));
@@ -99,6 +103,20 @@ public class ProfileFragment extends Fragment {
         familyMemberList.add(new FamilyMember("Clementine Bauch","Genel cerrahi",""));
         FamilyMemberAdapter doctorAdapter = new FamilyMemberAdapter(familyMemberList, getContext());
         s.setAdapter(doctorAdapter);
+        final LinearLayout layout = (LinearLayout) view.findViewById(R.id.haberver);
+        Switch haberVer = (Switch)  view.findViewById(R.id.haberverSwitch);
+        haberVer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    slideDown(layout);
+                }else{
+                    slideUp(layout);
+
+                }
+            }
+        });
+
 
         ImageButton buttonEdit = (ImageButton) view.findViewById(R.id.profileEdit);
         final TextView textViewUserName = (TextView) view.findViewById(R.id.textViewUserName);
@@ -121,7 +139,61 @@ public class ProfileFragment extends Fragment {
         });
         return view;
     }
+    public void slideUp(final View view){
 
+        TranslateAnimation animate = new TranslateAnimation(
+                0,                 // fromXDelta
+                0,                 // toXDelta
+                view.getHeight(),  // fromYDelta
+                0);                // toYDelta
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        view.startAnimation(animate);
+        animate.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+    }
+
+    // slide the view from its current position to below itself
+    public void slideDown(final View view){
+        TranslateAnimation animate = new TranslateAnimation(
+                0,                 // fromXDelta
+                0,                 // toXDelta
+                0,                 // fromYDelta
+                view.getHeight()); // toYDelta
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        view.startAnimation(animate);
+        animate.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+    }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

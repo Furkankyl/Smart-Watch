@@ -3,13 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Fragments.FamilyFragment">
+    android:focusable="false"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/listViewMember"
+        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:listSelector="@color/listViewSelectorColor"
         android:layout_marginTop="10dp"
         tools:listitem="@layout/family_simple_layout">
 
