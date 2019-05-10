@@ -26,12 +26,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.reeder.smartwatch.Adapters.GenderAdapter;
+import com.reeder.smartwatch.Model.User;
 import com.reeder.smartwatch.R;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -52,6 +66,19 @@ public class UserProfileFragment extends Fragment {
     private static final int IMAGE_ACTION_CODE = 102;
     private static final int CAMERA_PERMISSON_REQUEST_CODE = 103;
     private static final int IMAGE_REQUEST = 104;
+
+    List<String> genderList;
+
+    private FirebaseAuth auth;
+    private FirebaseUser firebaseUser;
+    private FirebaseFirestore db;
+
+    private EditText editTextAge;
+    private EditText editTextHeight;
+    private EditText editTextWeight;
+    private EditText editTextBio;
+    private Spinner spinnerGender;
+    private EditText editTextPhoneNumber;
 
     private ProgressDialog progressDialog;
 
@@ -113,6 +140,29 @@ public class UserProfileFragment extends Fragment {
         });
         ImageButton updateProfileImageButton = (ImageButton) view.findViewById(R.id.updateProfileImageButton);
 
+        spinnerGender = (Spinner) view.findViewById(R.id.spinnerGender);
+        editTextAge = (EditText) view.findViewById(R.id.editTextAge);
+        editTextBio= (EditText) view.findViewById(R.id.editTextBio);
+        editTextHeight= (EditText) view.findViewById(R.id.editTextHeight);
+        editTextWeight= (EditText) view.findViewById(R.id.editTextWeight);
+        editTextPhoneNumber = (EditText) view.findViewById(R.id.editTextPhoneNumber);
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+        firebaseUser = auth.getCurrentUser();
+
+        Button editProfileButton = (Button) view.findViewById(R.id.editProfileButton);
+        editProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateProfile();
+            }
+        });
+
+        genderList = new ArrayList<>();
+        genderList.add("Kadın");
+        genderList.add("Erkek");
+        GenderAdapter adapter = new GenderAdapter(genderList,getActivity());
+        spinnerGender.setAdapter(adapter);
         registerForContextMenu(updateProfileImageButton);
         updateProfileImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,6 +207,34 @@ public class UserProfileFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    public void updateProfile(){
+        HashMap<String,String> profile = new HashMap<>();
+        profile.put("displayName", firebaseUser.getDisplayName());
+        int age = Integer.valueOf(editTextAge.getText().toString());
+        int weight = Integer.valueOf(editTextWeight.getText().toString());
+        int height = Integer.valueOf(editTextHeight.getText().toString());
+        String bio = editTextBio.getText().toString();
+        String phoneNumber = editTextPhoneNumber.getText().toString();
+        User user = new User();
+        user.setAge(age);
+        user.setWeight(weight);
+        user.setHeight(height);
+        user.setBio(bio);
+        user.setPhoneNumber(phoneNumber);
+        user.setDisplayName(firebaseUser.getDisplayName());
+        user.setGender(genderList.get(spinnerGender.getSelectedItemPosition()));
+
+        db.collection("Users").document(firebaseUser.getUid()).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    Toast.makeText(getContext(), "Başarılı", Toast.LENGTH_SHORT).show();
+                }else
+                    Toast.makeText(getContext(), "Hata: "+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

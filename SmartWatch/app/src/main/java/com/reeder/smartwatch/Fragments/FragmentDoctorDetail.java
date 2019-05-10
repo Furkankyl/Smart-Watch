@@ -17,22 +17,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FragmentDoctorDetail.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FragmentDoctorDetail#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class FragmentDoctorDetail extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -93,6 +87,8 @@ public class FragmentDoctorDetail extends Fragment {
         TextView textViewPersonName = (TextView) view.findViewById(R.id.textViewPersonName);
         TextView textViewPersonExplonation = (TextView) view.findViewById(R.id.textViewPersonExplonation);
         ImageButton buttonBack  =(ImageButton) view.findViewById(R.id.buttonBack);
+        ImageView imageViewPerson = (ImageView) view.findViewById(R.id.imageViewPerson);
+        Picasso.get().load(doctor.getPhotoUrl()).into(imageViewPerson);
         buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,7 +106,7 @@ public class FragmentDoctorDetail extends Fragment {
             @Override
             public void onClick(View view) {
                 if(checkPermission()){
-                    callPhoneNumber("+905373620617");
+                    callPhoneNumber(doctor.getPhoneNumber());
                 }else{
                     requestPermission();
                 }
@@ -129,7 +125,7 @@ public class FragmentDoctorDetail extends Fragment {
         return view;
     }
     private void sendSms(String message) {
-        Uri uri = Uri.parse("smsto:"+ "+905373620617");
+        Uri uri = Uri.parse("smsto:"+ doctor.getPhoneNumber());
         Intent intent = new Intent (Intent.ACTION_SENDTO,uri);
         intent.putExtra("sms_body",message);
         startActivity(intent);

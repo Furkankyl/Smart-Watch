@@ -5,7 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +22,24 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.reeder.smartwatch.Adapters.FamilyMemberAdapter;
 import com.reeder.smartwatch.Model.FamilyMember;
+import com.reeder.smartwatch.Model.User;
 import com.reeder.smartwatch.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.support.constraint.Constraints.TAG;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 
 /**
@@ -49,6 +63,17 @@ public class ProfileFragment extends Fragment {
     private ImageView profileImageView;
     private OnFragmentInteractionListener mListener;
 
+    private TextView textViewUserName;
+    private TextView textViewUserAge;
+    private TextView textViewGender;
+    private TextView textViewHeight;
+    private TextView textViewWeight;
+    private TextView textViewBio;
+
+    private FirebaseAuth auth;
+    private FirebaseUser firebaseUser;
+    private FirebaseFirestore db;
+    private User user;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -84,19 +109,23 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-       /* FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-        FamilyFragment familyFragment = new FamilyFragment();
-        ft.replace(R.id.frameLayout,familyFragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.addToBackStack(null);
-        ft.commit();
-        */
-
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         profileImageView = (ImageView) view.findViewById(R.id.profileImage);
 
+        textViewUserName = (TextView) view.findViewById(R.id.textViewUserName);
+        textViewBio = (TextView) view.findViewById(R.id.textViewBio);
+        textViewGender =(TextView) view.findViewById(R.id.textViewGender);
+        textViewHeight = (TextView) view.findViewById(R.id.textViewHeight);
+        textViewUserAge = (TextView) view.findViewById(R.id.textViewUserAge);
+        textViewWeight = (TextView) view.findViewById(R.id.textViewWeight);
+
+        auth = FirebaseAuth.getInstance();
+        firebaseUser = auth.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
+        getUserData();
 
         Spinner s = (Spinner) view.findViewById(R.id.spinner);
+
         familyMemberList = new ArrayList<>();
         familyMemberList.add(new FamilyMember("John Doe","Kalp cerrahı",""));
         familyMemberList.add(new FamilyMember("Ervin Howell","Beyin cerrahı",""));
@@ -109,10 +138,11 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b){
-                    slideDown(layout);
+                    //slideDown(layout);
+                    layout.setVisibility(VISIBLE);
                 }else{
-                    slideUp(layout);
-
+                    //slideUp(layout);
+                    layout.setVisibility(GONE);
                 }
             }
         });
@@ -139,6 +169,37 @@ public class ProfileFragment extends Fragment {
         });
         return view;
     }
+
+    private void getUserData() {
+        db.collection("Users").document(firebaseUser.getUid())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        user = document.toObject(User.class);
+                        setUserInfo();
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void setUserInfo() {
+        textViewUserName.setText(user.getDisplayName());
+        textViewWeight.setText(""+user.getWeight());
+        textViewUserAge.setText(""+user.getAge());
+        textViewHeight.setText(""+user.getHeight());
+        textViewGender.setText(user.getGender());
+        textViewBio.setText(user.getBio());
+    }
+
     public void slideUp(final View view){
 
         TranslateAnimation animate = new TranslateAnimation(
@@ -157,7 +218,8 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                view.setVisibility(View.GONE);
+                view.setVisibility(GONE);
+
             }
 
             @Override
@@ -180,7 +242,7 @@ public class ProfileFragment extends Fragment {
         animate.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                view.setVisibility(View.VISIBLE);
+                view.setVisibility(VISIBLE);
             }
 
             @Override

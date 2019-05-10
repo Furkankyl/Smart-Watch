@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.reeder.smartwatch.Fragments.FragmentDoctorDetail;
 import com.reeder.smartwatch.Model.Doctor;
 import com.reeder.smartwatch.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -53,7 +54,9 @@ public class DoctorAdapter extends BaseAdapter {
         final Doctor doctor = doctorList.get(i);
         textViewPersonName.setText(doctor.getName());
         textViewExplonation.setText(doctor.getBio());
+        ImageView imageView = (ImageView) row_view.findViewById(R.id.imageViewPhoto);
 
+        Picasso.get().load(doctor.getPhotoUrl()).into(imageView);
         /*row_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
