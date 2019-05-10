@@ -1,5 +1,6 @@
 package com.reeder.smartwatch.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -21,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,13 +31,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.reeder.smartwatch.Helpers.HeartBeatView;
 import com.reeder.smartwatch.Model.User;
 import com.reeder.smartwatch.R;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
 import static android.support.constraint.Constraints.TAG;
 
 /**
@@ -61,7 +60,6 @@ public class HomeFragment extends Fragment {
     private FirebaseAuth auth;
     private FirebaseUser firebaseUser;
     private FirebaseFirestore db;
-
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -115,7 +113,7 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
@@ -124,7 +122,6 @@ public class HomeFragment extends Fragment {
         firebaseUser = auth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
         getUserData();
-
         heartBeatView = (HeartBeatView) view.findViewById(R.id.heartBeatView);
         haertBeatTextView = (TextView) view.findViewById(R.id.bpmTextView);
         heartBeatView.setDurationBasedOnBPM(70);
@@ -133,8 +130,10 @@ public class HomeFragment extends Fragment {
         textViewWeightHealthMessage = (TextView) view.findViewById(R.id.textViewWeightHealthMessage);
 
 
+
         return view;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -150,10 +149,10 @@ public class HomeFragment extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
+                    if (document != null && document.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         user = document.toObject(User.class);
-                        setWeightHealtInfo(user.getHeight(),user.getWeight());
+                        setWeightHealtInfo(user != null ? user.getHeight() : 0, user != null ? user.getWeight() : 0);
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -163,28 +162,31 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-    public void setWeightHealtInfo(int height,int weight){
-        double index = ((double)weight / (double) (height*height))*10000;
-        Log.d(TAG, "setWeightHealtInfo: "+index);
-        if(index < 18){
+
+    @SuppressLint("SetTextI18n")
+    public void setWeightHealtInfo(int height, int weight) {
+        double index = ((double) weight / (double) (height * height)) * 10000;
+        Log.d(TAG, "setWeightHealtInfo: " + index);
+        if (index < 18) {
             textViewWeightHealth.setText("Zayıfsın");
             textViewWeightHealthMessage.setText("Birşeyler yemen gerekli");
-        }else if(index >= 18 && index <= 24.9){
+        } else if (index >= 18 && index <= 24.9) {
             textViewWeightHealth.setText("Normalsin");
             textViewWeightHealthMessage.setText("Böyle kalmaya devam et");
-        }else if(index >= 25 && index <= 29.9){
+        } else if (index >= 25 && index <= 29.9) {
             textViewWeightHealth.setText("Fazla kilolusun");
             textViewWeightHealthMessage.setText("Yediklerine biraz dikkat et");
-        }else if(index >= 30 && index <= 39.9){
+        } else if (index >= 30 && index <= 39.9) {
             textViewWeightHealth.setText("Obezsin");
             textViewWeightHealthMessage.setText("Artık yemek yemeyi kes");
         }
 
 
     }
+
     public void initBluetooth() {
         devices = new ArrayList<>();
-        messageBuffer = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1);
+        messageBuffer = new ArrayAdapter<>(Objects.requireNonNull(getActivity()), android.R.layout.simple_list_item_1, android.R.id.text1);
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message message) {
@@ -286,9 +288,9 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "RESULT_OK", Toast.LENGTH_SHORT).show();
                 isConnected = true;
                 connectHC06();
-                Toast.makeText(getActivity().getApplicationContext(), "Bluetooth baslatildi.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Bluetooth baslatildi.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getActivity().getApplicationContext(), "Bluetooth baslatilamadi!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Bluetooth baslatilamadi!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -312,6 +314,7 @@ public class HomeFragment extends Fragment {
         new BTbaglan().execute();
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class BTbaglan extends AsyncTask<Void, Void, Void> {
         private boolean ConnectSuccess = true;
 
@@ -365,11 +368,10 @@ public class HomeFragment extends Fragment {
         InputStream mInputStream = null;
         //Message message;
 
-        public ReceiveData(BluetoothSocket socket) {
+        ReceiveData(BluetoothSocket socket) {
             Log.d("gelen", "ReceiveData: ");
-            BluetoothSocket bluetoothSocket = socket;
             try {
-                mInputStream = bluetoothSocket.getInputStream();
+                mInputStream = socket.getInputStream();
             } catch (IOException e) {
                 Log.d("hata", "InputStreami alma" + e);
                 e.printStackTrace();
@@ -391,6 +393,7 @@ public class HomeFragment extends Fragment {
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    break;
                 }
             }
         }
