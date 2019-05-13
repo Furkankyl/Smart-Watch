@@ -20,6 +20,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +33,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.reeder.smartwatch.Helpers.HeartBeatView;
 import com.reeder.smartwatch.Model.User;
 import com.reeder.smartwatch.R;
@@ -41,6 +48,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.support.constraint.Constraints.TAG;
 
 /**
@@ -65,7 +73,7 @@ public class HomeFragment extends Fragment {
     private FirebaseAuth auth;
     private FirebaseUser firebaseUser;
     private FirebaseFirestore db;
-
+    private LinearLayout horizontalItems;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -138,9 +146,34 @@ public class HomeFragment extends Fragment {
         heartBeatView.toggle();
         textViewWeightHealth = (TextView) view.findViewById(R.id.textViewWeightHealth);
         textViewWeightHealthMessage = (TextView) view.findViewById(R.id.textViewWeightHealthMessage);
+        horizontalItems = (LinearLayout) view.findViewById(R.id.casts_container);
 
+        setHorizontalScroll();
+        GraphView graph = (GraphView) view.findViewById(R.id.graph);
+        setGraph(graph);
         initBluetooth();
         return view;
+    }
+
+    private void setGraph(GraphView graph) {
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0, 1),
+                new DataPoint(1, 5),
+                new DataPoint(2, 3),
+                new DataPoint(3, 2),
+                new DataPoint(4, 6),
+
+        });
+        LineGraphSeries<DataPoint> series1 = new LineGraphSeries<>(new DataPoint[]{
+                new DataPoint(0, 4),
+                new DataPoint(1, 5),
+                new DataPoint(2, 4),
+                new DataPoint(3, 4),
+                new DataPoint(4, 4)
+
+        });
+        graph.addSeries(series);
+        graph.addSeries(series1);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -149,7 +182,38 @@ public class HomeFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+    private void setHorizontalScroll() {
+        //create LayoutInflator class
+        List<String> list = new ArrayList<>();
+        list.add("1 gün");
+        list.add("3 gün");
+        list.add("1 hafta");
+        list.add("1 gün");
+        list.add("3 gün");
+        list.add("1 hafta");
+        list.add("1 gün");
+        list.add("3 gün");
+        list.add("1 hafta");
+        list.add("1 gün");
+        list.add("3 gün");
+        list.add("1 hafta");
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
+        for (String str : list) {
 
+            RelativeLayout clickableColumn = (RelativeLayout) inflater.inflate(
+                    R.layout.horizontal_scroll_item, null);
+            Button button = (Button) clickableColumn.findViewById(R.id.buttonGraphTime);
+            button.setText(str);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getActivity(), "Vuuu", Toast.LENGTH_SHORT).show();
+                }
+            });
+            horizontalItems.addView(clickableColumn);
+
+        }
+    }
     private void getUserData() {
         db.collection("Users").document(firebaseUser.getUid())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -341,7 +405,7 @@ public class HomeFragment extends Fragment {
             }
             Log.d("liste", devices.toString());
             Toast.makeText(getActivity(), devices.toString(), Toast.LENGTH_SHORT).show();
-            address = devices.get(0).substring(devices.get(0).length() - 17); //Baslangic indexi
+            address = devices.get(1).substring(devices.get(1).length() - 17); //Baslangic indexi
             Log.d("liste", devices.toString());
             Log.d("adres", address);
         } else {

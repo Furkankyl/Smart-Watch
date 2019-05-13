@@ -66,8 +66,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
         android:layout_weight="2"
         android:background="@drawable/dialog_background"
@@ -82,22 +82,24 @@
             android:textColor="@color/colorAccent"
             android:textSize="18dp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/textViewWeightHealthMessage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="10dp"
-            android:text="test"/>
+            android:text="test" />
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="10dp"
         android:layout_weight="1"
+        android:orientation="vertical"
         android:background="@drawable/dialog_background">
 
         <!--<TextView
@@ -109,10 +111,34 @@
             android:textSize="18dp"
             android:textStyle="bold" />
           -->
-       <TextView
-           android:id="@+id/textViewRisk"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:textAlignment="center"/>
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/textViewRisk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center" />
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp">
+
+            <LinearLayout
+                android:id="@+id/casts_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+            </LinearLayout>
+        </HorizontalScrollView>
+        <com.jjoe64.graphview.GraphView
+            android:layout_width="match_parent"
+            android:layout_height="200dip"
+            android:id="@+id/graph" />
+
+    </LinearLayout>
 </LinearLayout>
