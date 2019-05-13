@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,12 +32,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.reeder.smartwatch.Helpers.HeartBeatView;
 import com.reeder.smartwatch.Model.User;
 import com.reeder.smartwatch.R;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
 import static android.support.constraint.Constraints.TAG;
 
 /**
@@ -56,6 +60,7 @@ public class HomeFragment extends Fragment {
     private TextView haertBeatTextView;
     private TextView textViewWeightHealth;
     private TextView textViewWeightHealthMessage;
+    private TextView textViewRisk;
     private User user;
     private FirebaseAuth auth;
     private FirebaseUser firebaseUser;
@@ -80,6 +85,9 @@ public class HomeFragment extends Fragment {
     ArrayList<String> devices;
     private ProgressDialog progress;
     private OnFragmentInteractionListener mListener;
+    private static int sum = 0, average, count = 0, tolerance = 20, anomalyCount;
+    int listSize = 50;
+    private List<Integer> last50pulse;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -122,18 +130,18 @@ public class HomeFragment extends Fragment {
         firebaseUser = auth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
         getUserData();
+        last50pulse = new ArrayList<>();
         heartBeatView = (HeartBeatView) view.findViewById(R.id.heartBeatView);
         haertBeatTextView = (TextView) view.findViewById(R.id.bpmTextView);
+        textViewRisk = (TextView) view.findViewById(R.id.textViewRisk);
         heartBeatView.setDurationBasedOnBPM(70);
         heartBeatView.toggle();
         textViewWeightHealth = (TextView) view.findViewById(R.id.textViewWeightHealth);
         textViewWeightHealthMessage = (TextView) view.findViewById(R.id.textViewWeightHealthMessage);
 
-
-
+        initBluetooth();
         return view;
     }
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -180,8 +188,6 @@ public class HomeFragment extends Fragment {
             textViewWeightHealth.setText("Obezsin");
             textViewWeightHealthMessage.setText("Artık yemek yemeyi kes");
         }
-
-
     }
 
     public void initBluetooth() {
@@ -198,22 +204,24 @@ public class HomeFragment extends Fragment {
                     //data = new String(readData, 0, dataLength);
                     messageBuffer.add(data);
                     String heartPulse, oxygen;
-                    try {
-                        heartPulse = data.split("\n")[0];
-                        heartPulse = heartPulse.substring(0, heartPulse.length() - 1);
-                        oxygen = data.split("\n")[1];
-                        oxygen = oxygen.substring(0, oxygen.length() - 1);
+                    Log.d("heartoks", data);
+                    heartPulse = data.split("\n")[0];
+                    int currentPulse = (int) Double.parseDouble(heartPulse);
+                    haertBeatTextView.setText(""+currentPulse);
+                    heartBeatView.setDurationBasedOnBPM(currentPulse);
+                    oxygen = data.split("\n")[1];
+                    int currentOxy = (int) Double.parseDouble(oxygen);
+                    if (currentPulse != 0 && currentOxy != 0) {
+                        getAverage(currentPulse);
+                        if (last50pulse.size() != listSize) last50pulse.add(currentPulse);
+                        else anomalyDetect(last50pulse);
                         Log.d("heartoks", "NAB " + heartPulse);
                         Log.d("heartoks", "OKS " + oxygen);
                         Toast.makeText(getActivity(), "Nabız: " + heartPulse, Toast.LENGTH_SHORT).show();
-                        haertBeatTextView.setText(heartPulse);
-                        heartBeatView.setDurationBasedOnBPM(Integer.valueOf(heartPulse));
                         Toast.makeText(getContext(), "Oksijen: " + oxygen, Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Toast.makeText(getContext(), "SPLIT HATA " + e, Toast.LENGTH_SHORT).show();
-                    }
-                    Log.d("gelen", "handleMessage: " + data);
-                    return true;
+                        Log.d("gelen", "handleMessage: " + data);
+                        return true;
+                    } else return false;
                 } else {
                     Log.d("hata", "MESAJ RECEIVED OLMADI");
                     return false;
@@ -230,7 +238,6 @@ public class HomeFragment extends Fragment {
                 connectHC06();
             else
                 startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
-
         }
     }
 
@@ -242,14 +249,11 @@ public class HomeFragment extends Fragment {
         } catch (Exception e) {
             Log.d(TAG, "Bluetooth bağlantısı kapatılamadı" + e);
         }
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-
     }
 
     @Override
@@ -293,6 +297,38 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Bluetooth baslatilamadi!", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public int getAverage(int pulse) {
+        count += 1;
+        sum += pulse;
+        average = sum / count;
+        Log.d("ortalama", "count = " + count + " gelen nabız = " + pulse + " toplam = " + sum + " ortalama = " + average);
+        return average;
+    }
+
+    public void anomalyDetect(List<Integer> pulses) {
+        for (int pulse : pulses) {
+            if (pulse > average + tolerance || pulse < average - tolerance) {
+                anomalyCount += 1;
+                Log.d("anomaly", "anomaly 1 arttı ORTALAMA = " + average + "MEVCUT DEĞER = " + pulse);
+            }
+        }
+        Log.d("ortalama", "anormal değer sayısı" + anomalyCount);
+        msg(count + " adet nabız içerisinde " + anomalyCount + " anormal nabız değeriniz tespit edildi.");
+        showRisk((100 * anomalyCount) / listSize);
+        msg("Son 50 ölçümde " + anomalyCount + " adet ANORMAL değer tespit edilmiştir");
+        pulses.clear();
+        anomalyCount = 0;
+    }
+
+    public void msg(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    public void showRisk(int risk) {
+        textViewRisk.setText("Risk seviyesi:"+risk);
+        Log.d("risk", String.valueOf(risk));
     }
 
     private void connectHC06() {

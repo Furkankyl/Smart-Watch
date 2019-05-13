@@ -20,9 +20,7 @@ import java.util.List;
 public class DoctorAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private List<Doctor> doctorList;
-    private FragmentManager fragmentManager;
-    public DoctorAdapter(List<Doctor> doctorList, Context context, FragmentManager fragmentManager) {
-        this.fragmentManager = fragmentManager;
+    public DoctorAdapter(List<Doctor> doctorList, Context context) {
         this.doctorList = doctorList;
         this.layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -57,21 +55,6 @@ public class DoctorAdapter extends BaseAdapter {
         ImageView imageView = (ImageView) row_view.findViewById(R.id.imageViewPhoto);
 
         Picasso.get().load(doctor.getPhotoUrl()).into(imageView);
-        /*row_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                fragmentManager
-                        .beginTransaction()
-                        .addSharedElement(imageViewPerson, "imageViewPerson1")
-                        .addSharedElement(textViewPersonName, "textViewPersonName1")
-                        .setCustomAnimations(R.anim.fade_in_animation,R.anim.fade_out_animation)
-                        .replace(R.id.frameLayout, new FragmentDoctorDetail(doctor))
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
-*/
         return row_view;
     }
 

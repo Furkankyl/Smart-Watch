@@ -40,6 +40,7 @@ import com.reeder.smartwatch.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,7 +68,7 @@ public class DoctorsFragment extends Fragment {
     private Dialog addDoctorDialog;
     private ProgressBar progressBar;
     private Doctor autoCompleteSelectedDoctor;
-    private static final String TAG = "DoctorsFragmetn";
+    private static final String TAG = "DoctorsFragment";
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -106,7 +107,7 @@ public class DoctorsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_doctors, container, false);
@@ -195,49 +196,52 @@ public class DoctorsFragment extends Fragment {
     }
 
     private void getUsersDoctors() {
-        if(doctorList.isEmpty())
+        if (doctorList.isEmpty())
             progressBar.setVisibility(View.VISIBLE);
         db.collection("Users")
                 .document(firebaseUser.getUid())
                 .collection("Doctors")
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                doctorList.clear();
-                if (task.isSuccessful()) {
-                    if (task.getResult().getDocuments() != null && !task.getResult().getDocuments().isEmpty()) {
-
-                        for (DocumentSnapshot documentSnapshot : task.getResult().getDocuments()) {
-                            Doctor doctor = documentSnapshot.toObject(Doctor.class);
-                            doctorList.add(doctor);
-                        }
-
-
-                    } else {
-                        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
-                        alertDialog.setTitle("Doktorlarım");
-                        alertDialog.setMessage("Henüz doktor eklememişsin");
-                        alertDialog.setPositiveButton("Doktor ekle", new DialogInterface.OnClickListener() {
+                .get()
+                .addOnCompleteListener(
+                        new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                showAddDoctorDialog();
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                doctorList.clear();
+                                if (task.isSuccessful()) {
+                                    Objects.requireNonNull(task.getResult()).getDocuments();
+                                    if (!task.getResult().getDocuments().isEmpty()) {
+
+                                        for (DocumentSnapshot documentSnapshot : task.getResult().getDocuments()) {
+                                            Doctor doctor = documentSnapshot.toObject(Doctor.class);
+                                            doctorList.add(doctor);
+                                        }
+
+
+                                    } else {
+                                        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                                        alertDialog.setTitle("Doktorlarım");
+                                        alertDialog.setMessage("Henüz doktor eklememişsin");
+                                        alertDialog.setPositiveButton("Doktor ekle", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                showAddDoctorDialog();
+                                            }
+                                        });
+                                        alertDialog.setNegativeButton("Tamam", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                            }
+                                        });
+                                        alertDialog.show();
+                                    }
+                                    doctorAdapter = new DoctorAdapter(doctorList, getContext());
+                                    listViewDoctors.setAdapter(doctorAdapter);
+                                    progressBar.setVisibility(View.GONE);
+                                } else {
+                                    Toast.makeText(getContext(), "Doktorlar yüklenemedi hata:" + task.getException(), Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
-                        alertDialog.setNegativeButton("Tamam", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        });
-                        alertDialog.show();
-                    }
-                    doctorAdapter = new DoctorAdapter(doctorList, getActivity(), getActivity().getSupportFragmentManager());
-                    listViewDoctors.setAdapter(doctorAdapter);
-                    progressBar.setVisibility(View.GONE);
-                } else {
-                    Toast.makeText(getContext(), "Doktorlar yüklenemedi hata:" + task.getException(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     private void getAllDoctors() {
@@ -245,7 +249,7 @@ public class DoctorsFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    task.getResult().getDocuments();
+                    Objects.requireNonNull(task.getResult()).getDocuments();
                     if (!task.getResult().getDocuments().isEmpty()) {
                         for (DocumentSnapshot documentSnapshot : task.getResult().getDocuments()) {
                             Doctor doctor = documentSnapshot.toObject(Doctor.class);
@@ -261,7 +265,7 @@ public class DoctorsFragment extends Fragment {
     }
 
     private void showAddDoctorDialog() {
-        addDoctorDialog = new Dialog(getContext());
+        addDoctorDialog = new Dialog(Objects.requireNonNull(getContext()));
         addDoctorDialog.setContentView(R.layout.add_family_member);
         addDoctorDialog.setTitle("Doktor ekle");
 
@@ -294,7 +298,9 @@ public class DoctorsFragment extends Fragment {
         });
         addDoctorDialog.show();
         Window window = addDoctorDialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     private void addDoctorCurrentUser() {
@@ -312,7 +318,7 @@ public class DoctorsFragment extends Fragment {
                             getUsersDoctors();
                             addDoctorDialog.dismiss();
                         } else {
-                            Toast.makeText(getContext(), "Hata:" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Hata:" + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

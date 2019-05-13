@@ -109,13 +109,10 @@
             android:textSize="18dp"
             android:textStyle="bold" />
           -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="50dp"
-            android:progressTint="#ff0"
-            android:progress="10"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
+       <TextView
+           android:id="@+id/textViewRisk"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:textAlignment="center"/>
     </RelativeLayout>
 </LinearLayout>
