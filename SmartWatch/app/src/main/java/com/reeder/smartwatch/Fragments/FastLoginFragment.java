@@ -27,7 +27,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.reeder.smartwatch.Activities.MainActivity;
+import com.reeder.smartwatch.Activities.UpdateUserInfoActivity;
 import com.reeder.smartwatch.R;
 
 import static android.support.constraint.Constraints.TAG;
@@ -51,7 +54,8 @@ public class FastLoginFragment extends Fragment {
     private GoogleApiClient googleApiClient;
     private FirebaseAuth auth;
     private FirebaseUser user;
-    private FirebaseAuth.AuthStateListener authStateListener;
+    private FirebaseFirestore db;
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -99,7 +103,7 @@ public class FastLoginFragment extends Fragment {
                 .requestEmail()
                 .build();
         auth = FirebaseAuth.getInstance();
-
+        db = FirebaseFirestore.getInstance();
         googleApiClient = new GoogleApiClient.Builder(getContext()).enableAutoManage(getActivity(), new GoogleApiClient.OnConnectionFailedListener() {
             @Override
             public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -173,6 +177,7 @@ public class FastLoginFragment extends Fragment {
             }
         }
     }
+
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
@@ -184,13 +189,36 @@ public class FastLoginFragment extends Fragment {
                         if (task.isSuccessful()) {
 
                             user = auth.getCurrentUser();
-                            Toast.makeText(getActivity(), "Hoş geldin: "+user.getDisplayName(), Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getActivity(), MainActivity.class));
+                            Toast.makeText(getActivity(), "Hoş geldin: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                            checkUserInfo();
+
+
                         } else {
                             // If sign in fails, display a message to the user.
 
                         }
                     }
                 });
+    }
+
+    private void checkUserInfo() {
+        db.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    if(task.getResult().getData() != null){
+                        Toast.makeText(getContext(), "Okey"+task.getResult(), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onComplete: "+task.getResult().getData());
+                        startActivity(new Intent(getContext(),MainActivity.class));
+                    }else{
+                        //Kayıt tamamlanmamış
+                        Log.d(TAG, "onCompletes: "+task.getResult().getData());
+                        startActivity(new Intent(getActivity(), UpdateUserInfoActivity.class));
+                    }
+                }else {
+                    Toast.makeText(getContext(), "Hata:"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

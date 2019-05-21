@@ -27,19 +27,24 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.reeder.smartwatch.Activities.MainActivity;
+import com.reeder.smartwatch.Activities.UpdateUserInfoActivity;
 import com.reeder.smartwatch.R;
 import com.reeder.smartwatch.Activities.ResetPasswordActivity;
 
 import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.support.constraint.Constraints.TAG;
 
 
 /**
@@ -238,11 +243,12 @@ public class LoginEmailFragment extends Fragment {
                     Animation slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in_animation);
                     dialogImage.startAnimation(slideUp);
                     textViewResult.startAnimation(slideUp);
+
+
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            startActivity(new Intent(getActivity(), MainActivity.class));
-                            getActivity().finish();
+                            checkUserInfo();
                         }
                     }, 1000);
                 } else {
@@ -260,6 +266,26 @@ public class LoginEmailFragment extends Fragment {
         });
     }
 
+    private void checkUserInfo() {
+        FirebaseFirestore.getInstance().collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    if(task.getResult().getData() != null){
+                        Toast.makeText(getContext(), "Okey"+task.getResult(), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onComplete: "+task.getResult().getData());
+                        startActivity(new Intent(getContext(),MainActivity.class));
+                    }else{
+                        //Kayıt tamamlanmamış
+                        Log.d(TAG, "onCompletes: "+task.getResult().getData());
+                        startActivity(new Intent(getActivity(), UpdateUserInfoActivity.class));
+                    }
+                }else {
+                    Toast.makeText(getContext(), "Hata:"+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
     private boolean validate() {
         boolean valid = true;
         String email = editTextEmail.getText().toString();

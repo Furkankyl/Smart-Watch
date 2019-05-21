@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frameLayout, new FamilyFragment());
+        transaction.replace(R.id.frameLayout, new HomeFragment());
         transaction.commit();
 
         authStateListener = new FirebaseAuth.AuthStateListener() {

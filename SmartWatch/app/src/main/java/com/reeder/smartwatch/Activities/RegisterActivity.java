@@ -239,7 +239,7 @@ public class RegisterActivity extends AppCompatActivity {
                     new Handler().postDelayed(new Runnable(){
                         @Override
                         public void run() {
-                            startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
+                            startActivity(new Intent(RegisterActivity.this,UpdateUserInfoActivity.class));
                             RegisterActivity.this.finish();
                         }
                     }, 1000);

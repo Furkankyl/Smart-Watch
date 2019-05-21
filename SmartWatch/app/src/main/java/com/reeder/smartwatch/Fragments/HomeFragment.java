@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,20 +31,25 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.reeder.smartwatch.Helpers.HeartBeatView;
+import com.reeder.smartwatch.Model.HeartBeat;
 import com.reeder.smartwatch.Model.User;
 import com.reeder.smartwatch.R;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -75,27 +80,33 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore db;
     private LinearLayout horizontalItems;
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int ACTION_REQUEST_ENABLE = 0;
-    BluetoothAdapter bluetooth; //Bluetooth açma, kapama, keşfetme işlemleri için
-    BluetoothSocket bluetoothSocket; //Bluetooth ile bağlanma, veri aktarımı için
-    ArrayAdapter<String> messageBuffer;
-    ReceiveData receiveData;
-    InputStream mInputStream;
-    final int MESSAGE_RECEIVED = 1;
-    public Handler mHandler;
-    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    String address;
-    public boolean isConnected = false;
-    Set<BluetoothDevice> listOfDevices;
-    ArrayList<String> devices;
+    private BluetoothAdapter bluetooth; //Bluetooth açma, kapama, keşfetme işlemleri için
+    private BluetoothSocket bluetoothSocket; //Bluetooth ile bağlanma, veri aktarımı için
+    private ArrayAdapter<String> messageBuffer;
+    private ReceiveData receiveData;
+    private InputStream mInputStream;
+    private final int MESSAGE_RECEIVED = 1;
+    private Handler mHandler;
+    private static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private String address;
+    private boolean isConnected = false;
+    private Set<BluetoothDevice> listOfDevices;
+    private ArrayList<String> devices;
     private ProgressDialog progress;
     private OnFragmentInteractionListener mListener;
     private static int sum = 0, average, count = 0, tolerance = 20, anomalyCount;
-    int listSize = 50;
+    private int listSize = 50;
     private List<Integer> last50pulse;
+
+    private LineGraphSeries<DataPoint> series;
+    private LineGraphSeries<DataPoint> series1;
+    private List<DataPoint> dataPoints;
+
+
+    private int x = 4;
+    private int y = 0;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -122,10 +133,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -148,15 +156,49 @@ public class HomeFragment extends Fragment {
         textViewWeightHealthMessage = (TextView) view.findViewById(R.id.textViewWeightHealthMessage);
         horizontalItems = (LinearLayout) view.findViewById(R.id.casts_container);
 
+        dataPoints = new ArrayList<>();
+        dataPoints.add(new DataPoint(0, 1));
+        dataPoints.add(new DataPoint(1, 3));
+        dataPoints.add(new DataPoint(2, 2));
+        dataPoints.add(new DataPoint(3, 4));
+        dataPoints.add(new DataPoint(4, 3));
+        dataPoints.add(new DataPoint(5, 5));
+
+
         setHorizontalScroll();
         GraphView graph = (GraphView) view.findViewById(R.id.graph);
         setGraph(graph);
+
+
+        for (int i = 0; i < 1000; i++) {
+            x += 1;
+            y = new Random().nextInt(10);
+            ;
+            series.appendData(new DataPoint(x, y), true, 1000);
+            series1.appendData(new DataPoint(x, 4), true, 1000);
+        }
+
+
         initBluetooth();
         return view;
     }
 
+    private void saveHeartBeat(final HeartBeat heartBeat) {
+        db.collection("Users").document(firebaseUser.getUid())
+                .collection("HeartBeats").add(heartBeat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "onComplete: success: " + heartBeat.toString());
+                } else {
+                    Log.d(TAG, "onComplete: error: " + task.getException().getMessage());
+                }
+            }
+        });
+    }
+
     private void setGraph(GraphView graph) {
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
+        series = new LineGraphSeries<DataPoint>(new DataPoint[]{
                 new DataPoint(0, 1),
                 new DataPoint(1, 5),
                 new DataPoint(2, 3),
@@ -164,16 +206,41 @@ public class HomeFragment extends Fragment {
                 new DataPoint(4, 6),
 
         });
-        LineGraphSeries<DataPoint> series1 = new LineGraphSeries<>(new DataPoint[]{
+        series.setColor(Color.MAGENTA);
+        series1 = new LineGraphSeries<>(new DataPoint[]{
                 new DataPoint(0, 4),
-                new DataPoint(1, 5),
+                new DataPoint(1, 4),
                 new DataPoint(2, 4),
                 new DataPoint(3, 4),
                 new DataPoint(4, 4)
 
         });
+        series.setAnimated(true);
+        series.setDataPointsRadius(10);
+
+        graph.setTitle("14 Mayıs 2019");
+        graph.setTitleColor(getResources().getColor(R.color.colorAccent));
         graph.addSeries(series);
+        graph.setTitleTextSize(18);
         graph.addSeries(series1);
+
+        //
+        graph.setBackgroundColor(Color.argb(20, 21, 97, 243));
+        graph.getGridLabelRenderer().setVerticalLabelsColor(getResources().getColor(R.color.colorAccent));
+        graph.getGridLabelRenderer().setHorizontalLabelsColor(getResources().getColor(R.color.colorAccent));
+        graph.getGridLabelRenderer().setVerticalLabelsColor(getResources().getColor(R.color.colorAccent));
+        graph.getGridLabelRenderer().setHorizontalLabelsColor(getResources().getColor(R.color.colorAccent));
+        graph.getGridLabelRenderer().reloadStyles();
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Horizontal");
+        graph.getGridLabelRenderer().setVerticalAxisTitle("Vertical");
+
+        //
+
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScalableY(true);
+        graph.getViewport().setScrollable(true);
+        graph.getViewport().setScrollableY(true);
+        graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -182,6 +249,7 @@ public class HomeFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+
     private void setHorizontalScroll() {
         //create LayoutInflator class
         List<String> list = new ArrayList<>();
@@ -197,7 +265,7 @@ public class HomeFragment extends Fragment {
         list.add("1 gün");
         list.add("3 gün");
         list.add("1 hafta");
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) Objects.requireNonNull(getActivity()).getSystemService(LAYOUT_INFLATER_SERVICE);
         for (String str : list) {
 
             RelativeLayout clickableColumn = (RelativeLayout) inflater.inflate(
@@ -207,6 +275,12 @@ public class HomeFragment extends Fragment {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    x += 1;
+
+                    y = new Random().nextInt(10);
+                    ;
+                    series.appendData(new DataPoint(x, y), true, 1000);
+                    series1.appendData(new DataPoint(x, 4), true, 1000);
                     Toast.makeText(getActivity(), "Vuuu", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -214,6 +288,7 @@ public class HomeFragment extends Fragment {
 
         }
     }
+
     private void getUserData() {
         db.collection("Users").document(firebaseUser.getUid())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -271,14 +346,22 @@ public class HomeFragment extends Fragment {
                     Log.d("heartoks", data);
                     heartPulse = data.split("\n")[0];
                     int currentPulse = (int) Double.parseDouble(heartPulse);
-                    haertBeatTextView.setText(""+currentPulse);
+
+                    haertBeatTextView.setText("" + currentPulse);
                     heartBeatView.setDurationBasedOnBPM(currentPulse);
                     oxygen = data.split("\n")[1];
+
+                    saveHeartBeat(new HeartBeat(Double.parseDouble(heartPulse),Double.parseDouble(oxygen),new Date(),false));
                     int currentOxy = (int) Double.parseDouble(oxygen);
                     if (currentPulse != 0 && currentOxy != 0) {
                         getAverage(currentPulse);
-                        if (last50pulse.size() != listSize) last50pulse.add(currentPulse);
-                        else anomalyDetect(last50pulse);
+                        if (last50pulse.size() != listSize)
+                            last50pulse.add(currentPulse);
+                        else {
+                            last50pulse.remove(0);
+                            last50pulse.add(currentPulse);
+                            anomalyDetect(last50pulse);
+                        }
                         Log.d("heartoks", "NAB " + heartPulse);
                         Log.d("heartoks", "OKS " + oxygen);
                         Toast.makeText(getActivity(), "Nabız: " + heartPulse, Toast.LENGTH_SHORT).show();
@@ -391,7 +474,7 @@ public class HomeFragment extends Fragment {
     }
 
     public void showRisk(int risk) {
-        textViewRisk.setText("Risk seviyesi:"+risk);
+        textViewRisk.setText("Risk seviyesi:" + risk);
         Log.d("risk", String.valueOf(risk));
     }
 
@@ -490,7 +573,6 @@ public class HomeFragment extends Fragment {
                         Log.d("okunan", "run: " + bytes);
                         mHandler.obtainMessage(MESSAGE_RECEIVED, bytes, -1, mBuffer).sendToTarget();
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     break;

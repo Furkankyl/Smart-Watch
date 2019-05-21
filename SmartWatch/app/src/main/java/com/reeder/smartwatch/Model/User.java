@@ -13,17 +13,28 @@ public class User {
     private String phoneNumber;
     private String bio;
     private String displayName;
+    private String familyPhoneNumber;
 
     public User() {
     }
 
-    public User(int age, int weight, int height, String gender, String phoneNumber, String bio) {
+    public User(int age, int weight, int height, String gender, String phoneNumber, String bio, String displayName, String familyPhoneNumber) {
         this.age = age;
         this.weight = weight;
         this.height = height;
         this.gender = gender;
         this.phoneNumber = phoneNumber;
         this.bio = bio;
+        this.displayName = displayName;
+        this.familyPhoneNumber = familyPhoneNumber;
+    }
+
+    public String getFamilyPhoneNumber() {
+        return familyPhoneNumber;
+    }
+
+    public void setFamilyPhoneNumber(String familyPhoneNumber) {
+        this.familyPhoneNumber = familyPhoneNumber;
     }
 
     public String getDisplayName() {

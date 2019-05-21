@@ -9,8 +9,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:allowBackup="true"
@@ -19,26 +19,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-
+        <activity android:name=".Activities.UpdateUserInfoActivity"></activity>
         <activity android:name=".Activities.UserProfileActivity" />
         <activity
             android:name=".Activities.ResetPasswordActivity"
             android:parentActivityName=".Activities.LoginActivity" />
         <activity
             android:name=".Activities.MainActivity"
-            android:label="@string/title_activity_main">
+            android:label="@string/title_activity_main"></activity>
+        <activity
+            android:name=".Activities.RegisterActivity"
+            android:windowSoftInputMode="" />
+        <activity android:name=".Activities.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".Activities.RegisterActivity"
-            android:windowSoftInputMode="" />
-        <activity android:name=".Activities.WelcomeActivity">
-
         </activity>
         <activity android:name=".Activities.LoginActivity" />
     </application>
