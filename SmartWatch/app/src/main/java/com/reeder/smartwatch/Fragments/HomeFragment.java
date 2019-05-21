@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,10 +35,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.reeder.smartwatch.Helpers.HeartBeatAnomally;
 import com.reeder.smartwatch.Helpers.HeartBeatView;
 import com.reeder.smartwatch.Model.HeartBeat;
 import com.reeder.smartwatch.Model.User;
@@ -96,17 +99,13 @@ public class HomeFragment extends Fragment {
     private ArrayList<String> devices;
     private ProgressDialog progress;
     private OnFragmentInteractionListener mListener;
-    private static int sum = 0, average, count = 0, tolerance = 20, anomalyCount;
-    private int listSize = 50;
-    private List<Integer> last50pulse;
+    GraphView graph;
+    private ProgressBar progressBar;
+    private HeartBeatAnomally heartBeatAnomally;
 
-    private LineGraphSeries<DataPoint> series;
-    private LineGraphSeries<DataPoint> series1;
-    private List<DataPoint> dataPoints;
+    private LineGraphSeries<DataPoint> heartBeatSeries;
+    private LineGraphSeries<DataPoint> avarageSeries;
 
-
-    private int x = 4;
-    private int y = 0;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -146,7 +145,6 @@ public class HomeFragment extends Fragment {
         firebaseUser = auth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
         getUserData();
-        last50pulse = new ArrayList<>();
         heartBeatView = (HeartBeatView) view.findViewById(R.id.heartBeatView);
         haertBeatTextView = (TextView) view.findViewById(R.id.bpmTextView);
         textViewRisk = (TextView) view.findViewById(R.id.textViewRisk);
@@ -156,27 +154,14 @@ public class HomeFragment extends Fragment {
         textViewWeightHealthMessage = (TextView) view.findViewById(R.id.textViewWeightHealthMessage);
         horizontalItems = (LinearLayout) view.findViewById(R.id.casts_container);
 
-        dataPoints = new ArrayList<>();
-        dataPoints.add(new DataPoint(0, 1));
-        dataPoints.add(new DataPoint(1, 3));
-        dataPoints.add(new DataPoint(2, 2));
-        dataPoints.add(new DataPoint(3, 4));
-        dataPoints.add(new DataPoint(4, 3));
-        dataPoints.add(new DataPoint(5, 5));
+        heartBeatAnomally = new HeartBeatAnomally();
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
 
 
         setHorizontalScroll();
-        GraphView graph = (GraphView) view.findViewById(R.id.graph);
+        graph =  (GraphView) view.findViewById(R.id.graph);
         setGraph(graph);
-
-
-        for (int i = 0; i < 1000; i++) {
-            x += 1;
-            y = new Random().nextInt(10);
-            ;
-            series.appendData(new DataPoint(x, y), true, 1000);
-            series1.appendData(new DataPoint(x, 4), true, 1000);
-        }
 
 
         initBluetooth();
@@ -198,31 +183,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void setGraph(GraphView graph) {
-        series = new LineGraphSeries<DataPoint>(new DataPoint[]{
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6),
 
-        });
-        series.setColor(Color.MAGENTA);
-        series1 = new LineGraphSeries<>(new DataPoint[]{
-                new DataPoint(0, 4),
-                new DataPoint(1, 4),
-                new DataPoint(2, 4),
-                new DataPoint(3, 4),
-                new DataPoint(4, 4)
 
-        });
-        series.setAnimated(true);
-        series.setDataPointsRadius(10);
+        getHeartBeats(new Date(),new Date());
+
 
         graph.setTitle("14 Mayıs 2019");
         graph.setTitleColor(getResources().getColor(R.color.colorAccent));
-        graph.addSeries(series);
         graph.setTitleTextSize(18);
-        graph.addSeries(series1);
 
         //
         graph.setBackgroundColor(Color.argb(20, 21, 97, 243));
@@ -231,8 +199,8 @@ public class HomeFragment extends Fragment {
         graph.getGridLabelRenderer().setVerticalLabelsColor(getResources().getColor(R.color.colorAccent));
         graph.getGridLabelRenderer().setHorizontalLabelsColor(getResources().getColor(R.color.colorAccent));
         graph.getGridLabelRenderer().reloadStyles();
-        graph.getGridLabelRenderer().setHorizontalAxisTitle("Horizontal");
-        graph.getGridLabelRenderer().setVerticalAxisTitle("Vertical");
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Sayı");
+        graph.getGridLabelRenderer().setVerticalAxisTitle("Nabız");
 
         //
 
@@ -241,6 +209,48 @@ public class HomeFragment extends Fragment {
         graph.getViewport().setScrollable(true);
         graph.getViewport().setScrollableY(true);
         graph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
+
+    }
+
+    private void getHeartBeats(Date startDate, Date endDate) {
+        progressBar.setVisibility(View.VISIBLE);
+        graph.setVisibility(View.GONE);
+        graph.removeAllSeries();
+        heartBeatSeries = new LineGraphSeries<>();
+        avarageSeries = new LineGraphSeries<>();
+        heartBeatSeries.setAnimated(true);
+        heartBeatSeries.setDataPointsRadius(10);
+        heartBeatSeries.setColor(Color.MAGENTA);
+
+
+        db.collection("Users").document(firebaseUser.getUid())
+                .collection("HeartBeats").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            int count = 1;
+                            int anomallyCount = 0;
+                            for (DocumentSnapshot snapshot : task.getResult()) {
+                                HeartBeat heartBeat = snapshot.toObject(HeartBeat.class);
+
+                                if(!heartBeat.isNormal())
+                                    anomallyCount++;
+                                heartBeatSeries.appendData(new DataPoint(count, heartBeat.getHeartBeat()), true, 100000);
+                                avarageSeries.appendData(new DataPoint(count++, 70), true, 10000);
+                            }
+
+                            Toast.makeText(getContext(), "Anormallik durumu=> Toplam nabız:"+count+"  Anormal nabız:"+anomallyCount, Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onComplete: "+"Anormallik durumu=> Toplam nabız:"+count+"  Anormal nabız:"+anomallyCount);
+                            progressBar.setVisibility(View.GONE);
+                            graph.addSeries(heartBeatSeries);
+                            graph.addSeries(avarageSeries);
+                            graph.setVisibility(View.VISIBLE);
+                        } else {
+                            Toast.makeText(getContext(), "Hata:" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -275,12 +285,7 @@ public class HomeFragment extends Fragment {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    x += 1;
-
-                    y = new Random().nextInt(10);
-                    ;
-                    series.appendData(new DataPoint(x, y), true, 1000);
-                    series1.appendData(new DataPoint(x, 4), true, 1000);
+                    getHeartBeats(new Date(),new Date());
                     Toast.makeText(getActivity(), "Vuuu", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -351,17 +356,12 @@ public class HomeFragment extends Fragment {
                     heartBeatView.setDurationBasedOnBPM(currentPulse);
                     oxygen = data.split("\n")[1];
 
-                    saveHeartBeat(new HeartBeat(Double.parseDouble(heartPulse),Double.parseDouble(oxygen),new Date(),false));
                     int currentOxy = (int) Double.parseDouble(oxygen);
                     if (currentPulse != 0 && currentOxy != 0) {
-                        getAverage(currentPulse);
-                        if (last50pulse.size() != listSize)
-                            last50pulse.add(currentPulse);
-                        else {
-                            last50pulse.remove(0);
-                            last50pulse.add(currentPulse);
-                            anomalyDetect(last50pulse);
-                        }
+                        HeartBeat heartBeat = new HeartBeat(Double.parseDouble(heartPulse), Double.parseDouble(oxygen), new Date(), false);
+                        heartBeat.setNormal(heartBeatAnomally.addHeartBeat(heartBeat));
+                        saveHeartBeat(heartBeat);
+
                         Log.d("heartoks", "NAB " + heartPulse);
                         Log.d("heartoks", "OKS " + oxygen);
                         Toast.makeText(getActivity(), "Nabız: " + heartPulse, Toast.LENGTH_SHORT).show();
@@ -446,28 +446,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    public int getAverage(int pulse) {
-        count += 1;
-        sum += pulse;
-        average = sum / count;
-        Log.d("ortalama", "count = " + count + " gelen nabız = " + pulse + " toplam = " + sum + " ortalama = " + average);
-        return average;
-    }
-
-    public void anomalyDetect(List<Integer> pulses) {
-        for (int pulse : pulses) {
-            if (pulse > average + tolerance || pulse < average - tolerance) {
-                anomalyCount += 1;
-                Log.d("anomaly", "anomaly 1 arttı ORTALAMA = " + average + "MEVCUT DEĞER = " + pulse);
-            }
-        }
-        Log.d("ortalama", "anormal değer sayısı" + anomalyCount);
-        msg(count + " adet nabız içerisinde " + anomalyCount + " anormal nabız değeriniz tespit edildi.");
-        showRisk((100 * anomalyCount) / listSize);
-        msg("Son 50 ölçümde " + anomalyCount + " adet ANORMAL değer tespit edilmiştir");
-        pulses.clear();
-        anomalyCount = 0;
-    }
 
     public void msg(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();

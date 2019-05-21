@@ -18,7 +18,7 @@ public class HeartBeatAnomally {
     }
 
     public double getAvarage(){
-        return sum/HEART_BEAT_LIST_SIZE;
+        return sum/heartBeatList.size();
     }
     public boolean addHeartBeat(HeartBeat heartBeat){
         if(heartBeatList.size() == HEART_BEAT_LIST_SIZE)
