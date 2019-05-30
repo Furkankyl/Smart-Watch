@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.reeder.smartwatch.Adapters.GenderAdapter;
 import com.reeder.smartwatch.Model.User;
@@ -62,8 +63,6 @@ public class UpdateUserInfoActivity extends AppCompatActivity {
     private Spinner spinnerGender;
     private EditText editTextPhoneNumber;
 
-    private ProgressDialog progressDialog;
-
     private Uri file;
     private ImageView imageView;
 
@@ -83,6 +82,7 @@ public class UpdateUserInfoActivity extends AppCompatActivity {
         editTextHeight = (EditText) findViewById(R.id.editTextHeight);
         editTextWeight = (EditText) findViewById(R.id.editTextWeight);
         editTextPhoneNumber = (EditText) findViewById(R.id.editTextPhoneNumber);
+        editTextFamilyNumber = (EditText) findViewById(R.id.editTextFamilyNumber);
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         firebaseUser = auth.getCurrentUser();
@@ -160,14 +160,12 @@ public class UpdateUserInfoActivity extends AppCompatActivity {
     }
 
     public void updateProfile() {
-        HashMap<String, String> profile = new HashMap<>();
-        profile.put("displayName", firebaseUser.getDisplayName());
         int age = Integer.valueOf(editTextAge.getText().toString());
         int weight = Integer.valueOf(editTextWeight.getText().toString());
         int height = Integer.valueOf(editTextHeight.getText().toString());
         String bio = editTextBio.getText().toString();
         String phoneNumber = editTextPhoneNumber.getText().toString();
-        User user = new User();
+        final User user = new User();
         user.setAge(age);
         user.setWeight(weight);
         user.setHeight(height);
@@ -175,11 +173,17 @@ public class UpdateUserInfoActivity extends AppCompatActivity {
         user.setPhoneNumber(phoneNumber);
         user.setDisplayName(firebaseUser.getDisplayName());
         user.setGender(genderList.get(spinnerGender.getSelectedItemPosition()));
-
+        user.setId(firebaseUser.getUid());
+        user.setSosPhoneNumber(editTextFamilyNumber.getText().toString());
         db.collection("Users").document(firebaseUser.getUid()).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
+
+                    HashMap<String,Object> map = new HashMap<>();
+                    map.put("id",firebaseUser.getUid());
+                    db.collection("Users").document(firebaseUser.getUid()).update(map);
+
                     Toast.makeText(UpdateUserInfoActivity.this, "Başarılı", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(UpdateUserInfoActivity.this, MainActivity.class));
                 } else

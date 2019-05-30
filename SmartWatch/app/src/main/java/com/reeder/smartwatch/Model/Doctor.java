@@ -6,15 +6,17 @@ public class Doctor {
     private String bio;
     private String photoUrl;
     private String phoneNumber;
+    private String token;
     public Doctor() {
     }
 
-    public Doctor(String name, String bio, String photoUrl, String phoneNumber,String id) {
+    public Doctor(String id, String name, String bio, String photoUrl, String phoneNumber, String token) {
+        this.id = id;
         this.name = name;
         this.bio = bio;
         this.photoUrl = photoUrl;
         this.phoneNumber = phoneNumber;
-        this.id = id;
+        this.token = token;
     }
 
     public String getId() {
@@ -55,5 +57,13 @@ public class Doctor {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getToken() {
+        return token;
     }
 }

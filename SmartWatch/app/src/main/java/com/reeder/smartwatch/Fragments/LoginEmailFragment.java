@@ -231,7 +231,7 @@ public class LoginEmailFragment extends Fragment {
                     user = auth.getCurrentUser();
                     progressBar.setVisibility(View.INVISIBLE);
                     dialogImage.setVisibility(View.VISIBLE);
-                    textViewDialogMessage.setText("Hoş geldin" + user.getDisplayName());
+                    textViewDialogMessage.setText("Hoş geldin: " + user.getDisplayName());
                     if (checkBoxRememberMe.isChecked()) {
                         saveUserEmail();
                     } else {

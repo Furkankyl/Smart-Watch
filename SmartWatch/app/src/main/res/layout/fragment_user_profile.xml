@@ -96,7 +96,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Yaş"
-                    android:text="22"
+                    android:text=""
                     android:inputType="number"
                     android:maxLines="1"
                     android:singleLine="true" />
@@ -137,6 +137,22 @@
                     android:layout_height="wrap_content"
                     android:hint="Boy"
                     android:inputType="number"
+
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/editTextFamilyNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Acil durum numarası"
+                    android:inputType="phone"
 
                     android:maxLines="1"
                     android:singleLine="true" />

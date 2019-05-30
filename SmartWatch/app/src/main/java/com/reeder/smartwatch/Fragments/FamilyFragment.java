@@ -107,7 +107,7 @@ public class FamilyFragment extends Fragment {
         Log.d(TAG, "setupViewPager: ");
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(new DoctorsFragment(),"Doktorlarım");
-        adapter.addFragment(new FamilyMembersFragment(), "Ailem");
+        //adapter.addFragment(new FamilyMembersFragment(), "Ailem");
         viewPager.setAdapter(adapter);
     }
     // TODO: Rename method, update argument and hook method into UI event

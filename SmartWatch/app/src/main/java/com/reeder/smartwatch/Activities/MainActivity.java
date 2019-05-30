@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             if (selectedFragment != null) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
                 if(fragment != null){
-                    Toast.makeText(MainActivity.this, "Silindi"+fragment.getClass(), Toast.LENGTH_SHORT).show();
                     getSupportFragmentManager().beginTransaction().remove(fragment).commit();
                 }
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

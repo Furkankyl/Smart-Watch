@@ -139,10 +139,10 @@ public class ProfileFragment extends Fragment {
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b){
                     //slideDown(layout);
-                    layout.setVisibility(VISIBLE);
+                    //layout.setVisibility(VISIBLE);
                 }else{
                     //slideUp(layout);
-                    layout.setVisibility(GONE);
+                   // layout.setVisibility(GONE);
                 }
             }
         });

@@ -72,7 +72,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Yaş"
-                    android:text="22"
+                    android:text=""
                     android:inputType="number"
                     android:maxLines="1"
                     android:singleLine="true" />

@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,6 +43,8 @@ import com.reeder.smartwatch.Adapters.GenderAdapter;
 import com.reeder.smartwatch.Model.User;
 import com.reeder.smartwatch.R;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +82,7 @@ public class UserProfileFragment extends Fragment {
     private EditText editTextBio;
     private Spinner spinnerGender;
     private EditText editTextPhoneNumber;
-
+    private EditText editTextFamilyNumber;
     private ProgressDialog progressDialog;
 
     private Uri file;
@@ -146,10 +149,12 @@ public class UserProfileFragment extends Fragment {
         editTextHeight= (EditText) view.findViewById(R.id.editTextHeight);
         editTextWeight= (EditText) view.findViewById(R.id.editTextWeight);
         editTextPhoneNumber = (EditText) view.findViewById(R.id.editTextPhoneNumber);
+        editTextFamilyNumber = (EditText) view.findViewById(R.id.editTextFamilyNumber);
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         firebaseUser = auth.getCurrentUser();
-
+        TextView textViewUserName = (TextView) view.findViewById(R.id.textViewUserName);
+        textViewUserName.setText(firebaseUser.getDisplayName());
         Button editProfileButton = (Button) view.findViewById(R.id.editProfileButton);
         editProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,11 +230,14 @@ public class UserProfileFragment extends Fragment {
         user.setPhoneNumber(phoneNumber);
         user.setDisplayName(firebaseUser.getDisplayName());
         user.setGender(genderList.get(spinnerGender.getSelectedItemPosition()));
-
+        user.setSosPhoneNumber(editTextFamilyNumber.getText().toString());
         db.collection("Users").document(firebaseUser.getUid()).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
+                    HashMap<String,Object> map = new HashMap<>();
+                    map.put("id",firebaseUser.getUid());
+                    db.collection("Users").document(firebaseUser.getUid()).update(map);
                     Toast.makeText(getContext(), "Başarılı", Toast.LENGTH_SHORT).show();
                 }else
                     Toast.makeText(getContext(), "Hata: "+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
